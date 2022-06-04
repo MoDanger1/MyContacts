@@ -13,6 +13,7 @@ namespace MyContacts
     public partial class frmAddOrEdit : Form
     {
         IContactsRepository repository;
+        public int contactId = 0;
         public frmAddOrEdit()
         {
             InitializeComponent();
@@ -21,7 +22,22 @@ namespace MyContacts
 
         private void frmAddOrEdit_Load(object sender, EventArgs e)
         {
-            this.Text = "افزودن شخص جدید";
+            if (contactId == 0)
+            {
+                this.Text = "افزودن مخاطب جدید";
+            }
+            else
+            {
+                this.Text = "ویرایش مخاطب";
+                DataTable dt = repository.SelectRow(contactId);
+                txtName.Text = dt.Rows[0][1].ToString();
+                txtFamily.Text = dt.Rows[0][2].ToString();
+                txtMobile.Text = dt.Rows[0][3].ToString();
+                txtEmail.Text = dt.Rows[0][4].ToString();
+                txtAge.Text = dt.Rows[0][5].ToString();
+                txtAddress.Text = dt.Rows[0][6].ToString();
+                btnSubmit.Text = "ویرایش";
+            }
         }
         bool ValidateInputs()
         {
@@ -58,7 +74,15 @@ namespace MyContacts
         {
             if (ValidateInputs())
             {
-                bool isSuccess = repository.Insert(txtName.Text, txtFamily.Text, txtMobile.Text, (int)txtAge.Value, txtEmail.Text, txtAddress.Text);
+                bool isSuccess;
+                if (contactId == 0)
+                {
+                    isSuccess = repository.Insert(txtName.Text, txtFamily.Text, txtMobile.Text, (int)txtAge.Value, txtEmail.Text, txtAddress.Text);
+                }
+                else
+                {
+                    isSuccess = repository.Update(contactId, txtName.Text, txtFamily.Text, txtMobile.Text, txtEmail.Text, (int)txtAge.Value, txtAddress.Text);
+                }
                 if (isSuccess == true)
                 {
                     MessageBox.Show("عملیات با موفقیت انجام شد", "ثبت شد", MessageBoxButtons.OK, MessageBoxIcon.Information);
